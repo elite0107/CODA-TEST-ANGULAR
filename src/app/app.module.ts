@@ -11,10 +11,12 @@ import { MiaCoreModule, MIA_GOOGLE_STORAGE_PROVIDER } from '@agencycoda/mia-core
 import { MiaTableModule } from '@agencycoda/mia-table';
 import { MiaFormModule } from '@agencycoda/mia-form';
 import { MiaLoadingModule } from '@agencycoda/mia-loading';
+import { ClientComponent } from './pages/client/client.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    ClientComponent
   ],
   imports: [
     BrowserModule,
@@ -29,8 +31,8 @@ import { MiaLoadingModule } from '@agencycoda/mia-loading';
     MiaFormModule,
   ],
   providers: [
-    { 
-      provide: MIA_AUTH_PROVIDER, 
+    {
+      provide: MIA_AUTH_PROVIDER,
       useValue: {
         baseUrl: environment.baseUrl
       }
