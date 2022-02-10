@@ -15,5 +15,4 @@ export class ClientService extends MiaBaseCrudHttpService<Client> {
     super(http);
     this.basePathUrl = environment.baseUrl + 'client';
   }
- 
 }
