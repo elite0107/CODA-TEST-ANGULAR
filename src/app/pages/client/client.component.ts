@@ -8,8 +8,8 @@ import { ClientService } from 'src/app/services/client.service';
 import { MiaConfirmModalComponent, MiaConfirmModalConfig, MiaPagination, MiaQuery } from '@agencycoda/mia-core';
 import { MiaTableComponent, MiaTableConfig } from '@agencycoda/mia-table';
 import { MatDialog } from '@angular/material/dialog';
-import { MiaField, MiaFormConfig, MiaFormModalComponent, MiaFormModalConfig } from '@agencycoda/mia-form';
-import { RequiredValidator, Validators } from '@angular/forms';
+import { MiaField, MiaFormConfig, MiaFormModalV2Component, MiaFormModalV2Config } from '@agencycoda/mia-form';
+import { Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-client',
@@ -67,6 +67,21 @@ export class ClientComponent implements OnInit {
     this.tableConfig.onClick.subscribe(action => {
       this.handleActions(action);
     })
+
+    this.mockData = {
+      current_page: 1,
+      first_page_url: '',
+      from: '',
+      last_page: 1,
+      last_page_url: '',
+      next_page_url: '',
+      path: '',
+      per_page: 5,
+      prev_page_url: '',
+      to: '',
+      total: 1,
+      data: []
+    }
   }
 
   /**
@@ -85,15 +100,16 @@ export class ClientComponent implements OnInit {
   }
 
   /**
-   * Show Modal depending on the action
+   * Show Modal depending on action.
    * @param action Action will be performed (edit, erase)
    */
-  showFormModal(item: any) {
-    let data = new MiaFormModalConfig;
+  showFormModal(item: any, type: string = 'edit') {
+    let data = new MiaFormModalV2Config();
     data.item = item;
     data.service = this.clientService;
-    data.titleNew = 'Add Client';
-    data.titleEdit = 'Edit Client';
+    if (type === 'edit') data.title = 'Edit Client';
+    else data.title = 'Add Client'
+    data.service = this.clientService;
 
     let config = new MiaFormConfig();
     config.hasSubmit = false;
@@ -102,11 +118,8 @@ export class ClientComponent implements OnInit {
       { key: 'lastname', type: MiaField.TYPE_STRING, label: 'surname', validators: [Validators.required] },
       { key: 'email', type: MiaField.TYPE_STRING, label: 'email', validators: [Validators.required] }
     ];
-    // config.errorMessages = [
-    //   { key: 'required', message: 'The "%label%" is required' }
-    // ]
     data.config = config;
-    return this.dialog.open(MiaFormModalComponent, {
+    return this.dialog.open(MiaFormModalV2Component, {
       width: '520px',
       panelClass: 'modal-full-width-mobile',
       data: data
@@ -136,7 +149,7 @@ export class ClientComponent implements OnInit {
 
         this.clientService
           .removeOb(id)
-          .subscribe(res => this.reloadMockData())
+          .subscribe(() => this.reloadMockData())
       })
   }
 
@@ -144,15 +157,14 @@ export class ClientComponent implements OnInit {
    * Show Add Client Modal
    */
   addClient() {
-    this.showFormModal({})
-      .subscribe(res => this.reloadMockData());
+    this.showFormModal({}, 'create')
+      .subscribe((saved) => saved && this.reloadMockData());
   }
 
   /**
    * Reload Mockdata
    */
   reloadMockData() {
-    this.queryScroll.pageCurrent = 1;
     this.clientService.list(this.queryScroll);
     this.tableComp.loadItems();
   }
